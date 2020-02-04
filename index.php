@@ -20,7 +20,7 @@
 
 include 'function.php';
 
-$pdo = new PDO('mysql:host=localhost;dbname=restaurant;charset=utf8', 'step25', 'step25');
+
 
 echo "<h3>1. Lister les commandes de la table n°10, les trier par date chronologique (SELECT WHERE ORDER BY)</h3>";
 $sql = ('SELECT * FROM commandes WHERE idTable=10 ORDER BY DateCommande');
@@ -162,7 +162,7 @@ creteTable($sql,$arr);
 
 echo '<h3>3. Afficher pour chaque mois de 2019, le nb de menus commandés et le CA que cela représente</h3>';
 $sql = ('SELECT DATE_FORMAT(DateCommande, "%m/%Y"), 
-        COUNT(commande_menus.idMenu),COUNT(commande_menus.idCommande), SUM(prixVente) 
+        COUNT(distinct (commandes.idCommande)),COUNT(commande_menus.idMenu), SUM(prixVente) 
         FROM commandes,commande_menus,menus 
         WHERE commandes.idCommande=commande_menus.idCommande and menus.idMenu=commande_menus.idMenu 
         and YEAR(DateCommande)=2019 GROUP BY DATE_FORMAT(DateCommande, "%m/%Y")');
@@ -172,7 +172,7 @@ $arr=["Date 2019","No de Commandes","No de Menu","Somme De Vente"];
 creteTable($sql,$arr);
 
 echo '<h3>4. Afficher aussi les commandes pour lesquels aucun menu n’a été commandé (LEFT JOIN)</h3>';
-$sql = ('SELECT DATE_FORMAT(DateCommande, "%m-%Y"), COUNT(commandes.idCommande), COUNT(menus.idMenu), SUM(menus.PrixVente) 
+$sql = ('SELECT DATE_FORMAT(DateCommande, "%m-%Y"), COUNT(distinct commandes.idCommande), COUNT(menus.idMenu), SUM(menus.PrixVente) 
         FROM commandes LEFT JOIN commande_menus ON commandes.idCommande=commande_menus.idCommande
         LEFT JOIN menus ON commande_menus.idMenu=menus.idMenu
         where YEAR(DateCommande)=2019
@@ -183,7 +183,7 @@ $arr=["Date 2019","No de Commandes","No de Menu","Somme De Vente"];
 creteTable($sql,$arr);
 
 echo '<h3>5. Afficher la même chose pour les plats à la carte</h3>';
-$sql = ('SELECT DATE_FORMAT(DateCommande, "%m/%Y"), COUNT(commandes.idCommande), COUNT(plats.idPlat), SUM(plats.PrixVente) 
+$sql = ('SELECT DATE_FORMAT(DateCommande, "%m/%Y"), COUNT(distinct commandes.idCommande), COUNT(plats.idPlat), SUM(plats.PrixVente) 
         FROM commandes LEFT JOIN commande_plats ON commandes.idCommande=commande_plats.idCommande
         LEFT JOIN plats ON commande_plats.idPlat=plats.idPlat
         where YEAR(DateCommande)=2019
@@ -194,8 +194,8 @@ $arr=["Date 2019","No de Commandes","No de Plat","Somme De Vente"];
 creteTable($sql,$arr);
 
 echo '<h3>6. Afficher pour chaque mois de 2019 le CA total hors boisson (menu + plat à la carte)</h3>';
-$sql = ('SELECT DATE_FORMAT(DateCommande, "%m/%Y"), COUNT(commandes.idCommande), COUNT(plats.idPlat),
-        COUNT(menus.idMenu), SUM(plats.PrixVente),SUM(menus.PrixVente) FROM commandes 
+$sql = ('SELECT DATE_FORMAT(DateCommande, "%m/%Y"), COUNT(distinct commandes.idCommande), COUNT(plats.idPlat),
+        COUNT(menus.idMenu), SUM(plats.PrixVente)+SUM(menus.PrixVente) FROM commandes 
         left JOIN commande_plats ON commandes.idCommande=commande_plats.idCommande 
         left JOIN commande_menus ON commandes.idCommande=commande_menus.idCommande
         left JOIN plats ON commande_plats.idPlat=plats.idPlat 

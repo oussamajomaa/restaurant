@@ -1,6 +1,9 @@
 <?php
 
-    function afficher($pdo,$sql){
+// error_reporting(E_ALL);
+// ini_set("display_errors", 1);    
+
+function afficher($pdo,$sql){
         $sql = $pdo->prepare($sql);
         $sql->execute();
 
@@ -22,3 +25,8 @@
         }
         echo '</table>';
     }
+
+
+    $pdo = new PDO('mysql:host=localhost;dbname=restaurant;charset=utf8', 'step25', 'step25');
+    
+?>
